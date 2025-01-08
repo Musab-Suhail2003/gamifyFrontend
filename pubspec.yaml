@@ -1,0 +1,115 @@
+name: Gamify
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.2
+  widgets_to_image: ^0.0.2
+  universal_html: ^2.2.2
+  image: ^4.0.17
+  responsive_framework: ^1.0.0
+  auto_size_text: ^3.0.0
+  flutter_animate: ^4.1.1+1
+  flutter_svg: ^2.0.6
+  simple_shadow: ^0.3.1
+  expandable: ^5.0.1
+  blur: ^3.1.0
+  fluttertoast: ^8.2.2
+  url_launcher_web: ^2.0.17
+  equatable: ^2.0.7
+  flutter_bloc: ^8.1.6
+  http: ^1.2.2
+  bloc_test: ^9.1.7
+  google_sign_in: ^6.2.2
+  mockito: ^5.4.4
+  build_runner: ^2.4.13
+  cookie_jar: ^4.0.8
+  shared_preferences: ^2.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^2.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+ 
+  assets:
+    # Backgrounds..
+    - assets/backgrounds/background_1.png
+    - assets/backgrounds/background_2.png
+
+    # back accessories..
+    - assets/human_a/back_accessories/back_1.png
+
+    # bodies..
+    - assets/human_a/bodies/body_1.png
+    - assets/human_a/bodies/body_2.png
+    
+    # Eyes 
+    - assets/human_a/eyes/eyes_1.png
+    - assets/human_a/eyes/eyes_2.png
+    - assets/human_a/eyes/eyes_3.png
+
+    # Faces..
+    - assets/human_a/face/face_1/angry.png
+    - assets/human_a/face/face_1/laughing.png
+    - assets/human_a/face/face_1/normal.png
+    - assets/human_a/face/face_1/sad.png
+    - assets/human_a/face/face_1/smile.png
+    - assets/human_a/face/face_1/smirk.png
+    - assets/human_a/face/face_1/surprise.png
+    - assets/human_a/face/face_1/very_angry.png
+    
+    # Face accessories
+    - assets/human_a/face_accessories/accessory_1.png
+    
+    # Facepaints
+    - assets/human_a/facepaints/facepaint_1.png
+    
+    # Hair..
+    - assets/human_a/hairs/hair_0.png
+
+    # Head Wear..
+    - assets/human_a/headwear/headware_2.png
+    - assets/human_a/headwear/headware_1.png
+    
+    # Outfits..
+    - assets/human_a/outfit/outfit_1_var1.png
+    - assets/human_a/outfit/outfit_1_var2.png
+    - assets/human_a/outfit/outfit_1.png
+
+    # Other facial features...
+    - assets/human_a/iris/iris.png
+    - assets/human_a/noses/nose1.png
+
+    # invisible
+    - assets/invisible.png
+    
+ 
+ 
