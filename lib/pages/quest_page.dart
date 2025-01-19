@@ -3,6 +3,7 @@ import 'package:Gamify/bloc/user_model_bloc.dart';
 import 'package:Gamify/pages/characterTile.dart';
 import 'package:Gamify/pages/characterpage.dart';
 import 'package:Gamify/pages/leaderboard.dart';
+import 'package:Gamify/pages/settingspage.dart';
 import 'package:Gamify/ui_elements/progressBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -65,7 +66,9 @@ class _QuestPageState extends State<QuestPage> {
           title: const Text('Quests'),
           centerTitle: true,
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.settings)),
+            IconButton(onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+            }, icon: const Icon(Icons.settings)),
           ],
         ),
         body: BlocBuilder<QuestModelBloc, QuestModelState>(
