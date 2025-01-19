@@ -19,13 +19,7 @@ class LoginPage extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.tertiary,
             title: const Text('Gamify'),
-            centerTitle: true,
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.settings)
-              )
-            ],
+            centerTitle: true
           ),
           body: Center(
             child: Column(

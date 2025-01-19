@@ -1,7 +1,6 @@
 import 'package:Gamify/bloc/task_bloc.dart';
 import 'package:Gamify/models/task_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TaskPage extends StatefulWidget {
@@ -28,50 +27,62 @@ class _TaskPageState extends State<TaskPage> {
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.tertiary,
       ),
-      body: BlocBuilder<TaskBloc, TaskState>(
-        builder: (context, state) {
-          if (state is TaskInitial) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is TaskLoaded) {
-            if (state.tasks.isEmpty) {
-              return const Center(child: Text("No Tasks Added Yet"));
-            }
-            return ListView.builder(
-              itemCount: state.tasks.length,
-              itemBuilder: (context, index) {
-                final task = state.tasks[index];
-                //if(task.completed == null || task.completed == false)
-                  return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    title: Text(task.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(task.completed?"completed":'', style: TextStyle(color: Theme.of(context).colorScheme.tertiary),),
-                        Text(task.description),
-                        Text("Level: ${task.level.toString().split('.').last}"),
-                        Text("XP: ${Task.levelXpMap[task.level]}"),
-                      ],
-                    ),
-                    trailing: Checkbox(
-                      value: task.completed,
-                      onChanged: (value){                  
-                        context.read<TaskBloc>().add(CompleteTask(task.task_id, task.milestone_id));
-                        value = true;
-                      },
-                      
-                    ),
-                  ),
-                );
-                
-              },
+      body: BlocListener<TaskBloc, TaskState>(
+        listener: (context, state) {
+          if (state is TaskError) {
+            // Show error message in a Snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
             );
-          } else {
-            return const Center(child: Text("Failed to load tasks."));
           }
-
         },
+        child: BlocBuilder<TaskBloc, TaskState>(
+          builder: (context, state) {
+            if (state is TaskInitial) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is TaskLoaded) {
+              if (state.tasks.isEmpty) {
+                return const Center(child: Text("No Tasks Added Yet"));
+              }
+              return ListView.builder(
+                itemCount: state.tasks.length,
+                itemBuilder: (context, index) {
+                  final task = state.tasks[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: ListTile(
+                      title: Text(task.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            task.completed ? "Completed" : '',
+                            style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
+                          ),
+                          Text(task.description),
+                          Text("Level: ${task.level.toString().split('.').last}"),
+                          Text("XP: ${Task.levelXpMap[task.level]}"),
+                        ],
+                      ),
+                      trailing: Checkbox(
+                        value: task.completed,
+                        onChanged: (value) {
+                          context.read<TaskBloc>().add(CompleteTask(task.task_id, task.milestone_id));
+                        },
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return const Center(
+              child: Text('Failed to Load tasks retry'),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTaskDialog(context),
@@ -83,8 +94,6 @@ class _TaskPageState extends State<TaskPage> {
       ),
     );
   }
-
-
 
   void _showAddTaskDialog(BuildContext context) {
     final titleController = TextEditingController();
@@ -154,7 +163,7 @@ class _TaskPageState extends State<TaskPage> {
                 final String title = titleController.text.trim();
                 final String description = descriptionController.text.trim();
 
-                if (title.isEmpty || description.isEmpty || selectedLevel == null) {
+                if (title.isEmpty || description.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Please fill out all fields.")),
                   );
@@ -190,6 +199,4 @@ class _TaskPageState extends State<TaskPage> {
       },
     );
   }
-
-
 }

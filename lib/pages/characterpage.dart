@@ -1,6 +1,5 @@
 import 'package:Gamify/api/api_repo.dart';
 import 'package:Gamify/bloc/character_bloc.dart';
-import 'package:Gamify/bloc/character_customization_bloc.dart';
 import 'package:Gamify/models/character_model.dart';
 import 'package:Gamify/pages/characterTile.dart';
 import 'package:flutter/material.dart';
@@ -271,7 +270,7 @@ class _CharacterCustomizationScreenState extends State<CharacterCustomizationScr
     );
   }
 
-  Widget characterTile(CharacterCustomizationState state, BuildContext context){
+  Widget characterTile(CharacterState state, BuildContext context){
     return Expanded(
                 flex: 2,
                   child:

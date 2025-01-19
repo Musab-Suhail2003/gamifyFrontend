@@ -139,7 +139,7 @@ Future<void> _onCompleteTask(
     }
   } catch (e) {
     print('Error in _onCompleteTask: ${e.toString()}');
-    emit(TaskError('Failed to complete task: ${e.toString()}'));
+    emit(TaskError('${e.toString()}'));
   }
 }
 

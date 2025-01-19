@@ -1,20 +1,24 @@
 import 'package:Gamify/api/api_repo.dart';
 import 'package:Gamify/bloc/api_bloc.dart';
 import 'package:Gamify/bloc/character_bloc.dart';
-import 'package:Gamify/bloc/character_customization_bloc.dart';
 import 'package:Gamify/bloc/leaderboard_bloc.dart';
 import 'package:Gamify/bloc/milestone_bloc.dart';
 import 'package:Gamify/bloc/task_bloc.dart';
+import 'package:Gamify/bloc/user_model_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:Gamify/bloc/quest_model_bloc.dart';
 import 'package:Gamify/pages/login.dart';
 import 'package:Gamify/ui_elements/themes.dart';
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [
+        BlocProvider<UserModelBloc>(
+            create: (context) => UserModelBloc(),
+        ),
         BlocProvider<ApiBloc>(
           create: (context) => ApiBloc(apiRepository: ApiRepository()),
         ),
@@ -26,9 +30,6 @@ void main() {
         ),
          BlocProvider<TaskBloc>(
           create: (context) => TaskBloc()
-        ),
-        BlocProvider<CharacterCustomizationBloc>(
-          create: (context) => CharacterCustomizationBloc()
         ),
         BlocProvider<CharacterBloc>(
           create: (context) => CharacterBloc()
@@ -44,7 +45,7 @@ void main() {
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
       title: 'Gamify',
       theme: mytheme,
       home: const LoginPage(),
+      navigatorObservers: [routeObserver],
     );
   }
 }

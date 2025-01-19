@@ -70,15 +70,49 @@ class _MilestonePageState extends State<MilestonePage> {
                       vertical: 8.0
                     ),
                     child: ListTile(
+                      leading: IconButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Start Milestone!   Not reversable', style: TextStyle(fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),),
+                                  content: ElevatedButton(
+                                    onPressed: (){
+                                      context.read<MilestoneBloc>().add(
+                                          UpdateMilestone(milestone)
+                                      );
+
+                                      Navigator.of(context).pop();
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Milestone started successfully!'),
+                                        ),
+                                      );
+                                    },
+                                    child: Text('start'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                      , icon: const Icon(Icons.play_arrow)),
                       title: Text(
                         milestone.title,
                         style: const TextStyle(fontWeight: FontWeight.bold)
                       ),
                       subtitle: Text(milestone.description),
-                      trailing: Column(children: [
+                      trailing: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
                         CompletionProgressBar(percentage: milestone.completionPercent, ),
-                        Text("${milestone.completionPercent}% done"),
-                        Text("due in ${milestone.days} days")
+                        Text("${milestone.completionPercent}%"),
+                        Text((milestone.days>0)?"${milestone.days} days left":"Late will only get half the points"),
+                        Text((milestone.startTime != null)?'Started':'Not Started')
                       ],),
                     ),
                   ),
@@ -222,5 +256,7 @@ void _showAddQuestDialog(BuildContext context) {
     },
   );
 }
+
+
 
 }

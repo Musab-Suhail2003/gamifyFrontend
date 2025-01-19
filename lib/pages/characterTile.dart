@@ -18,6 +18,7 @@ class _CharacterTileState extends State<CharacterTile> {
 
   @override
   Widget build(BuildContext context) {
+    print('making character tile for ${widget.userId}');
     return BlocBuilder<CharacterBloc, CharacterState>(
       builder: (context, state) {
         if (state is CharacterLoading) {
@@ -62,7 +63,7 @@ class _CharacterTileState extends State<CharacterTile> {
                   ),
                   child: Image(
                     image: AssetImage(state.backgrounds[state.backgroundIndex]),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 // Character elements

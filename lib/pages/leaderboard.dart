@@ -1,10 +1,13 @@
+import 'package:Gamify/bloc/character_bloc.dart';
 import 'package:Gamify/bloc/leaderboard_bloc.dart';
 import 'package:Gamify/pages/characterTile.dart';
+import 'package:Gamify/pages/characterpage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LeaderBoardPage extends StatefulWidget {
-  const LeaderBoardPage({super.key});
+  final userData;
+  const LeaderBoardPage({super.key, required this.userData});
 
   @override
   State<LeaderBoardPage> createState() => _LeaderBoardPageState();
@@ -16,13 +19,14 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LeaderboardBloc()..add(LoadLeaderboard()),
-      child: const LeaderboardView(),
+      child: LeaderboardView(userData: widget.userData,),
     );
   }
 }
 
 class LeaderboardView extends StatelessWidget {
-  const LeaderboardView({Key? key}) : super(key: key);
+  final userData;
+  const LeaderboardView({Key? key, required this.userData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +62,11 @@ class LeaderboardView extends StatelessWidget {
                     onPressed: () {
                       context.read<LeaderboardBloc>().add(LoadLeaderboard());
                     },
-                    child: const Text('Try Again'),
+                    child: const Text('Try Again', style: TextStyle(color: Colors.black)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.tertiary, 
+                    ), 
+
                   ),
                 ],
               ),
@@ -70,7 +78,7 @@ class LeaderboardView extends StatelessWidget {
               onRefresh: () async {
                 context.read<LeaderboardBloc>().add(RefreshLeaderboard());
               },
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Expanded(
@@ -81,7 +89,26 @@ class LeaderboardView extends StatelessWidget {
                   
                   flex: 1,
                     child: leaderboard(state),
-                )
+                ),
+                  Expanded(
+                      flex: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+
+                          Expanded(flex: 0, child: IsolatedCharacterTile(userId: userData['_id'])),
+                          Row(children: [ Text("coin: ${userData['coin']} XP: ${userData['XP']} ")],),
+                          ElevatedButton(onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => CharacterCustomizationScreen(character_id: userData['Character'], userId: userData['_id'],)));
+                          },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.tertiary,
+                            ),
+                            child: const Text('Customize', style: TextStyle(color: Colors.black)),
+                          ) ,
+                        ],
+                      )
+                  )
                 ],
               )
             );
@@ -112,55 +139,52 @@ class LeaderboardView extends StatelessWidget {
     return CharacterTile(userId: state.selectedUserId);
   }
 
-  Widget leaderboard (LeaderboardLoaded state){
+  Widget leaderboard(LeaderboardLoaded state) {
     return ListView.builder(
-                itemCount: state.entries.length,
-                itemBuilder: (context, index) {
-                  final entry = state.entries[index];
-                  
-                  return Expanded(
-                    
-                    child: Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: ListTile(
-                      onTap: (){
-                          context.read<LeaderboardBloc>().add(
-                            SelectLeaderboardUser(
-                              (state.selectedUserId == null ? entry.user.user_id : null)
-                            )
-                          );
-                        },
-                      leading: CircleAvatar(
-                        child: Image.network(entry.user.profilePicture!),
-                      ),
-                      title: Row(
-                        children: [
-                           Text(
-                        entry.user.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ), const SizedBox(width: 20,),
-                        ],
-                      ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('XP: ${entry.totalXP}', style: const TextStyle(fontSize: 12),),
-                          Text('Coin: ${entry.totalCoin}', style: const TextStyle(fontSize: 12)),
-                          Text('Quests: ${entry.user.questsCompleted}', style: const TextStyle(fontSize: 12))
-                        ],
-                      ),
-                      trailing: _buildRankBadge(entry.rank),
-                    ),
-                  ),
+      itemCount: state.entries.length,
+      itemBuilder: (context, index) {
+        final entry = state.entries[index];
+
+        return Card(  // Remove the Expanded here
+          margin: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          child: ListTile(
+            onTap: () {
+              context.read<LeaderboardBloc>().add(
+                  SelectLeaderboardUser(
+                      (state.selectedUserId == null ? entry.user.user_id : null)
                   )
-                  ;
-                },
               );
+            },
+            leading: CircleAvatar(
+              child: Image.network(entry.user.profilePicture!),
+            ),
+            title: Row(
+              children: [
+                Text(
+                  entry.user.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 20,),
+              ],
+            ),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('XP: ${entry.totalXP}', style: const TextStyle(fontSize: 12),),
+                Text('Coin: ${entry.totalCoin}', style: const TextStyle(fontSize: 12)),
+                Text('Quests: ${entry.user.questsCompleted}', style: const TextStyle(fontSize: 12))
+              ],
+            ),
+            trailing: _buildRankBadge(entry.rank),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildRankBadge(int rank) {
@@ -185,5 +209,22 @@ class LeaderboardView extends StatelessWidget {
     }
 
     return Icon(icon, color: color, size: 30);
+  }
+}
+
+class IsolatedCharacterTile extends StatelessWidget {
+  final String userId;
+
+  const IsolatedCharacterTile({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => CharacterBloc(),
+      child: CharacterTile(userId: userId),
+    );
   }
 }

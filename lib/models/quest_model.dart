@@ -21,7 +21,9 @@ class QuestModel {
       quest_id: json['_id'],
       user_id: json['user_id'],
       quest_name: json['quest_name'],
-      completion_percent: json['completion_percent'],
+      completion_percent: (json['completion_percent'] is double)
+          ? json['completion_percent'].toInt() // Convert float to int
+          : json['completion_percent'] as int,
       quest_description: json['quest_description'],
       paused: json['paused']
     );

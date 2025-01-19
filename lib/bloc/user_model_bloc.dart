@@ -60,7 +60,7 @@ class UserModelBloc extends Bloc<UserModelEvent, UserModelState> {
   on<RefreshUserModel>((event, emit) async {
       try {
         // Simulate an API call or database query to fetch updated user data
-        final userModel = await ApiRepository().fetchUserModel(event.userId); // Replace with actual API logic
+        final userModel = await ApiRepository().fetchUserModel(event.userId);
 
         emit(UserModelLoaded(userModel));
       } catch (e) {
@@ -70,9 +70,8 @@ class UserModelBloc extends Bloc<UserModelEvent, UserModelState> {
     });
   }
 
-  // Simulate a function to fetch user data (replace with actual logic)
   Future<Map<String, dynamic>> _fetchUserData(String userId) async {
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
     return {
       "_id": userId,
       "username": "UpdatedUser",

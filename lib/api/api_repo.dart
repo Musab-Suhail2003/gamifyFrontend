@@ -8,7 +8,7 @@ import 'package:Gamify/models/milestone_model.dart';
 import 'package:Gamify/models/task_model.dart';
 import 'package:Gamify/models/user_model.dart';
 
-const String baseUrl = 'https://gamifybackend.vercel.app/';
+const String baseUrl = 'http://10.0.2.2:3000';
 Map<String, dynamic>? user;
 String? token;
 
@@ -230,6 +230,22 @@ class ApiRepository {
     }
   }
 
+  Future<void> startMilestone(dynamic milestone_id) async {
+    print('starting milestone with id $milestone_id');
+    final response = await client.patch(
+      Uri.parse('$baseUrl/milestones/$milestone_id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'startTime': DateTime.now().toIso8601String()
+      }),
+    );
+    if (response.statusCode > 299) {
+      throw Exception('Failed to start milestone');
+    }
+  }
+
   Future<void> postTask(Task task) async {
     final response = await client.post(
       Uri.parse('$baseUrl/tasks/'),
@@ -248,7 +264,7 @@ class ApiRepository {
     try {
       // First fetch all users sorted by XP
       final response = await client.get(
-        Uri.parse('$baseUrl/users'),
+        Uri.parse('$baseUrl/users/'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -258,6 +274,8 @@ class ApiRepository {
 
         // For each user, fetch their character info and combine the data
         for (var userJson in usersJson) {
+          print(userJson);
+
           final user = UserModel.fromJson(userJson);
           
           // Fetch the user's main character
@@ -280,12 +298,13 @@ class ApiRepository {
           }
         }
 
+
         return leaderboard;
       } else {
         throw Exception('Failed to load leaderboard data');
       }
     } catch (e) {
-      throw Exception('$e');
+      throw Exception('Failed to connect to server');
     }
   }
 }
@@ -320,7 +339,7 @@ class GoogleSignInProvider {
 
       // Send the idToken to your Node.js backend
       final response = await _client.post(
-        Uri.parse('$baseUrl/users/google-login'), // Ensure this is the correct endpoint
+        Uri.parse('$baseUrl/users/google-login'),
         headers: {
           'Content-Type': 'application/json',
         },

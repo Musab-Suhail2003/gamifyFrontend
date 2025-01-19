@@ -297,4 +297,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthError(e.toString()));
     }
   }
+
+  Future<void> _onGoogleSignOutRequested(
+      GoogleSignInRequested event,
+      Emitter<AuthState> emit,
+      ) async {
+    try {
+      emit(AuthLoading());
+
+      final result = await _googleSignInProvider.signOut();
+
+      emit(AuthSuccess(result as Map<String, dynamic>));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
 }

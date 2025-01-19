@@ -5,6 +5,7 @@ class Milestone {
   final String description;
   final int days;
   final int completionPercent;
+  DateTime? startTime;
 
 
   Milestone({
@@ -14,7 +15,7 @@ class Milestone {
     required this.description,
     required this.days,
     required this.completionPercent,
-
+    this.startTime
   });
 
   factory Milestone.fromJson(Map<String, dynamic> json) {
@@ -27,6 +28,7 @@ class Milestone {
       completionPercent: (json['completionPercent'] is double)
           ? json['completionPercent'].toInt() // Convert float to int
           : json['completionPercent'] as int,
+      startTime: json['startTime'] == null? null :DateTime.parse(json['startTime'])
     );
   }
 
@@ -36,7 +38,7 @@ class Milestone {
       'title': title,
       'description': description,
       'days': days,
-      'completionPercent': completionPercent
+      'completionPercent': completionPercent,
     };
   }
 }

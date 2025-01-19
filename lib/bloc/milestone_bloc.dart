@@ -110,7 +110,21 @@ class MilestoneBloc extends Bloc<MilestoneEvent, MilestoneState> {
   MilestoneBloc() : super(MilestoneInitial()) {
     on<FetchMilestones>(_onFetchMilestones);
     on<postMilestone>(_onPostMilestone);
-    on<MilestoneLoad>(_onMilestoneLoad);  // Add the handler for MilestoneLoad
+    on<MilestoneLoad>(_onMilestoneLoad);  // Corrected handler name to match event
+    on<UpdateMilestone>(_onUpdateMilestone);
+  }
+
+  Future<void> _onUpdateMilestone(UpdateMilestone event, Emitter<MilestoneState> emit) async {
+    emit(MilestonesLoading());
+    try {
+      await apirepo.startMilestone(event.milestone.milestone_id);
+
+      final updatedMilestones = await apirepo.fetchMilestonesbyQuest(event.milestone.questId);
+      emit(MilestonesLoaded(updatedMilestones));
+    } catch (e) {
+      print(e.toString());
+      emit(MilestoneError('Failed to Update Milestone: ${e.toString()}'));
+    }
   }
 
   Future<void> _onFetchMilestones(FetchMilestones event, Emitter<MilestoneState> emit) async {
@@ -123,28 +137,26 @@ class MilestoneBloc extends Bloc<MilestoneEvent, MilestoneState> {
     }
   }
 
-  
-
   Future<void> _onPostMilestone(postMilestone event, Emitter<MilestoneState> emit) async {
     emit(MilestonesLoading());
     try {
       await apirepo.postMilestone(event.milestone);
-      emit(MilestonesLoaded([event.milestone]));  // Optionally, reload the milestones
+      // Optionally, reload the milestones after posting
+      final milestones = await apirepo.fetchMilestonesbyQuest(event.milestone.questId);
+      emit(MilestonesLoaded(milestones));
     } catch (e) {
       emit(MilestoneError("Failed to post milestone: ${e.toString()}"));
     }
   }
 
-  // Event handler for MilestoneLoad
   Future<void> _onMilestoneLoad(MilestoneLoad event, Emitter<MilestoneState> emit) async {
     emit(MilestonesLoading());
     try {
       final milestones = await apirepo.fetchMilestonesbyQuest(event.questId);
-      emit(MilestonesLoaded(milestones)); // Emit the loaded milestones
+      emit(MilestonesLoaded(milestones));
     } catch (e) {
-      print(e.toString());
       emit(MilestoneError("Failed to load milestones: ${e.toString()}"));
     }
   }
-
 }
+
