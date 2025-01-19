@@ -1,13 +1,13 @@
 // test/widget_test/character_tile_test.dart
 
 import 'package:Gamify/bloc/character_bloc.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:Gamify/pages/characterTile.dart';
 import 'package:mockito/mockito.dart';
 import '../helper/test_helper.dart';
-
 void main() {
   late MockCharacterBloc characterBloc;
 
@@ -15,8 +15,16 @@ void main() {
     characterBloc = MockCharacterBloc();
   });
 
+  tearDown(() {
+    characterBloc.close();
+  });
+
   testWidgets('CharacterTile displays loading state', (WidgetTester tester) async {
-    when(() => characterBloc.state).thenReturn(CharacterLoading() as CharacterState Function());
+    whenListen(
+      characterBloc,
+      Stream.fromIterable([CharacterLoading()]),
+      initialState: CharacterInitial(),
+    );
 
     await tester.pumpWidget(
       BlocProvider<CharacterBloc>.value(
@@ -30,7 +38,11 @@ void main() {
 
   testWidgets('CharacterTile displays error state', (WidgetTester tester) async {
     const errorMessage = 'Error loading character';
-    when(() => characterBloc.state).thenReturn(CharacterError(errorMessage) as CharacterState Function());
+    whenListen(
+      characterBloc,
+      Stream.fromIterable([CharacterError(errorMessage)]),
+      initialState: CharacterInitial(),
+    );
 
     await tester.pumpWidget(
       BlocProvider<CharacterBloc>.value(
@@ -43,7 +55,11 @@ void main() {
   });
 
   testWidgets('CharacterTile golden test', (WidgetTester tester) async {
-    when(() => characterBloc.state).thenReturn(CharacterLoading() as CharacterState Function());
+    whenListen(
+      characterBloc,
+      Stream.fromIterable([CharacterLoading()]),
+      initialState: CharacterInitial(),
+    );
 
     await tester.pumpWidget(
       BlocProvider<CharacterBloc>.value(

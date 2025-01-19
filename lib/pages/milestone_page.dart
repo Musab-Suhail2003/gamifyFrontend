@@ -111,7 +111,7 @@ class _MilestonePageState extends State<MilestonePage> {
                         children: [
                         CompletionProgressBar(percentage: milestone.completionPercent, ),
                         Text("${milestone.completionPercent}%"),
-                        Text((milestone.days>0)?"${milestone.days} days left":"Late will only get half the points"),
+                        Text((milestone.days>0)?"${milestone.days} days limit":"Late will only get half the points"),
                         Text((milestone.startTime != null)?'Started':'Not Started')
                       ],),
                     ),

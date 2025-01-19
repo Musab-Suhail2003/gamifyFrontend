@@ -79,7 +79,7 @@ class _TaskPageState extends State<TaskPage> {
               );
             }
             return const Center(
-              child: Text('Failed to Load tasks retry'),
+              child: Text('Remember to start the milestone'),
             );
           },
         ),
