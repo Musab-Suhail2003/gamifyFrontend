@@ -1,3 +1,4 @@
+import 'package:Gamify/bloc/character_bloc.dart';
 import 'package:Gamify/bloc/user_model_bloc.dart';
 import 'package:Gamify/pages/characterTile.dart';
 import 'package:Gamify/pages/characterpage.dart';
@@ -35,35 +36,103 @@ class _QuestPageState extends State<QuestPage> {
   Widget build(BuildContext context) {
     final userData = widget.userData;
     return BlocListener<ApiBloc, ApiState>(
-      listener: (context, state){
-        if(state is ApiLoaded){
-          context.read<QuestModelBloc>().add(LoadQuestModel(widget.userData['_id']));
+      listener: (context, state) {
+        if (state is ApiLoaded) {
+          context.read<QuestModelBloc>().add(LoadQuestModel(userData['_id']));
+          context.read<UserModelBloc>().add(RefreshUserModel(userData['_id']));
+          context.read<CharacterBloc>().add(LoadUserCharacters(userData['_id']));
         }
       },
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(onPressed:
-              () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LeaderBoardPage(userData: widget.userData,),
-              ),
-            );
-          }
-              , icon: const Icon(Icons.leaderboard, weight: 50,)),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LeaderBoardPage(userData: userData),
+                ),
+              ).then((_) {
+                // Refresh data when returning from LeaderBoardPage
+                context.read<QuestModelBloc>().add(LoadQuestModel(userData['_id']));
+                context.read<UserModelBloc>().add(RefreshUserModel(userData['_id']));
+                context.read<CharacterBloc>().add(LoadUserCharacters(userData['_id']));
+              });
+            },
+            icon: const Icon(Icons.leaderboard, weight: 50),
+          ),
           backgroundColor: Theme.of(context).colorScheme.tertiary,
           title: const Text('Quests'),
           centerTitle: true,
-          actions: [IconButton(onPressed:(){} , icon: const Icon(Icons.settings))],
+          actions: [
+            IconButton(onPressed: () {}, icon: const Icon(Icons.settings)),
+          ],
         ),
         body: BlocBuilder<QuestModelBloc, QuestModelState>(
           builder: (context, state) {
             if (state is QuestModelInitial) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is QuestModelLoaded) {
-              if (state.quests.isEmpty){
-                return const Center(child: Text("No Quests Added Yet"),);
+              if (state.quests.isEmpty) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child:  const Center(child: Text("No Quests Added Yet")),),
+                    Expanded(
+                      flex: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            flex: 0,
+                            child: CharacterTile(userId: userData['_id']),
+                          ),
+                          Row(
+                            children: [
+                              Text("coin: ${userData['coin']} XP: ${userData['XP']} "),
+                            ],
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CharacterCustomizationScreen(
+                                    character_id: userData['Character'],
+                                    userId: userData['_id'],
+                                  ),
+                                ),
+                              ).then((_) {
+                                // Refresh user data after returning
+                                context
+                                    .read<UserModelBloc>()
+                                    .add(RefreshUserModel(userData['_id']));
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                              Theme.of(context).colorScheme.tertiary,
+                            ),
+                            child: const Text(
+                              'Customize',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                          FloatingActionButton(
+                            onPressed: () {
+                              _showAddQuestDialog(context, userData);
+                            },
+                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                            child: const Text(
+                              'Add +\nQuest',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
               }
               return Column(
                 children: [
@@ -80,25 +149,30 @@ class _QuestPageState extends State<QuestPage> {
                               MaterialPageRoute(
                                 builder: (context) => MilestonePage(quest: quest),
                               ),
-                            );
+                            ).then((_) {
+                              context
+                                  .read<QuestModelBloc>()
+                                  .add(LoadQuestModel(userData['_id']));
+                            });
                           },
                           child: Card(
                             margin: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 8.0
-                            ),
+                                horizontal: 16.0, vertical: 8.0),
                             child: ListTile(
                               title: Text(
-                                  quest.quest_name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold)
+                                quest.quest_name,
+                                style:
+                                const TextStyle(fontWeight: FontWeight.bold),
                               ),
                               subtitle: Text(quest.quest_description),
-
                               trailing: Column(
                                 children: [
-                                  const SizedBox(height: 10,),
+                                  const SizedBox(height: 10),
                                   Text("${quest.completion_percent}% done"),
-                                  CompletionProgressBar(percentage: quest.completion_percent, height: 4)
+                                  CompletionProgressBar(
+                                    percentage: quest.completion_percent,
+                                    height: 4,
+                                  ),
                                 ],
                               ),
                             ),
@@ -108,34 +182,60 @@ class _QuestPageState extends State<QuestPage> {
                     ),
                   ),
                   Expanded(
-
                     flex: 0,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Expanded(flex: 0, child: IsolatedCharacterTile(userId: userData['_id'])),
-                        Row(children: [ Text("coin: ${userData['coin']} XP: ${userData['XP']} ")],),
-                        ElevatedButton(onPressed: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => CharacterCustomizationScreen(character_id: userData['Character'], userId: userData['_id'],)));
-                        },
+                        Expanded(
+                          flex: 0,
+                          child: CharacterTile(userId: userData['_id']),
+                        ),
+                        Row(
+                          children: [
+                            Text("coin: ${userData['coin']} XP: ${userData['XP']} "),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CharacterCustomizationScreen(
+                                  character_id: userData['Character'],
+                                  userId: userData['_id'],
+                                ),
+                              ),
+                            ).then((_) {
+                              // Refresh user data after returning
+                              context
+                                  .read<UserModelBloc>()
+                                  .add(RefreshUserModel(userData['_id']));
+                            });
+                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                            backgroundColor:
+                            Theme.of(context).colorScheme.tertiary,
                           ),
-                          child: const Text('Customize', style: TextStyle(color: Colors.black),),
-                        ) ,
+                          child: const Text(
+                            'Customize',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
                         FloatingActionButton(
-                          onPressed: (){
+                          onPressed: () {
                             _showAddQuestDialog(context, userData);
                           },
                           backgroundColor: Theme.of(context).colorScheme.tertiary,
-                          child: const Text('Add +\nQuest', style: TextStyle(color: Colors.black),),
+                          child: const Text(
+                            'Add +\nQuest',
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ],
               );
-
             } else {
               return const Center(child: Text('Failed to load quests.'));
             }
@@ -200,7 +300,6 @@ class _QuestPageState extends State<QuestPage> {
 
                   Navigator.of(context).pop();
                 } else {
-                  // Show an error if fields are empty
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Please fill out all fields."),

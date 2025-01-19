@@ -79,7 +79,7 @@ class _TaskPageState extends State<TaskPage> {
               );
             }
             return const Center(
-              child: Text('Remember to start the milestone'),
+              child: Text('Remember to start the milestone\n      before completing a quest!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
             );
           },
         ),
