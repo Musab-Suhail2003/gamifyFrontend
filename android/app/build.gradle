@@ -7,12 +7,13 @@ plugins {
 
 android {
     namespace = "com.example.project_flutter_appdev"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -20,9 +21,8 @@ android {
     }
 
     defaultConfig {
-        // Application ID for your app
         applicationId = "com.example.project_flutter_appdev"
-        minSdk = flutter.minSdkVersion
+        minSdk = 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -31,21 +31,22 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.debug
-            // Enable minification for release builds
             minifyEnabled false
             shrinkResources false
-            // Proguard rules can be customized here if needed
         }
     }
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-auth:20.7.0' // For Google Sign-In
-
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation platform('com.google.firebase:firebase-bom:32.2.2')
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 }
 
 flutter {
     source = "../.."
 }
 
-apply plugin: 'com.google.gms.google-services'  // Add this line
+apply plugin: 'com.google.gms.google-services'

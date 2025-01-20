@@ -1,6 +1,5 @@
 import 'package:Gamify/api/api_repo.dart';
 import 'package:flutter/material.dart';
-import 'package:Gamify/bloc/api_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});

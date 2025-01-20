@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:Gamify/bloc/leaderboard_bloc.dart';
 import 'package:Gamify/models/character_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:Gamify/models/quest_model.dart';
@@ -176,11 +177,14 @@ class ApiRepository {
 
   Future<UserModel> fetchUserModel(dynamic userId) async {
     final response = await client.get(
-      Uri.parse('$baseUrl/users/$userId')
+      Uri.parse('$baseUrl/users/refresh/$userId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
     );
 
     if (response.statusCode == 200) {
-      return UserModel.fromJson(jsonDecode(response.body));
+      return UserModel.fromJson(jsonDecode(response.body)['user']);
     } else {
       throw Exception('Failed to load user');
     }
@@ -199,6 +203,62 @@ class ApiRepository {
       throw Exception('Failed to create user');
     }
   }
+
+  Future<void> updateBio(String userId, String newBio) async {
+    final String apiUrl = '$baseUrl/users/bio/$userId'; // Replace with your server's base URL
+
+    try {
+      final response = await http.patch(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'newBio': newBio,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print('Bio updated successfully: ${responseData['user']}');
+      } else if (response.statusCode == 404) {
+        print('Error: User not found');
+      } else if (response.statusCode == 400) {
+        print('Error: Invalid request - ${response.body}');
+      } else {
+        print('Error: Failed to update bio - Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<void> fetchAndSendToken(String userId) async {
+    try {
+      String? token = await FirebaseMessaging.instance.getToken();
+      print("FCM Token: $token");
+
+      final response = await http.patch(
+        Uri.parse('$baseUrl/users/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "fcm_token": token,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Token sent successfully $token');
+      } else {
+        print('Failed to send token ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching token: $e");
+    }
+  }
+
 
   Future<void> postQuestModelbyUser(QuestModel questModel) async {
     final response = await client.post(

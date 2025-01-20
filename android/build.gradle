@@ -1,5 +1,8 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext{
+        coreLibraryDesugaringEnabled = true
+        kotlin_version = '1.7.10'
+    }
     repositories {
         google()
         mavenCentral()

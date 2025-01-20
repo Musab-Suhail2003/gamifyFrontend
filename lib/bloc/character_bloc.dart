@@ -117,7 +117,6 @@ class CharacterInitial extends CharacterState {}
 class CharacterLoading extends CharacterState {}
 
 class CharacterLoaded extends CharacterState {
-  @override
   final Character character;
   final int hairstyleIndex;
   final int outfitIndex;

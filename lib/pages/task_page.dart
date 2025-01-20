@@ -5,7 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TaskPage extends StatefulWidget {
   final dynamic milestoneId;
-  const TaskPage({super.key, required this.milestoneId});
+  final String milestoneName;
+  const TaskPage({super.key, required this.milestoneId, required this.milestoneName});
 
   @override
   State<TaskPage> createState() => _TaskPageState();
@@ -23,7 +24,7 @@ class _TaskPageState extends State<TaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tasks"),
+        title: Text(widget.milestoneName, softWrap: true,),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.tertiary,
       ),

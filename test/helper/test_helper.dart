@@ -1,13 +1,10 @@
 // test/helper/test_helper.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:Gamify/bloc/character_bloc.dart';
 import 'package:Gamify/bloc/leaderboard_bloc.dart';
 import 'package:Gamify/bloc/quest_model_bloc.dart';
-import 'package:Gamify/models/character_model.dart';
-import 'package:mockito/mockito.dart';
 
 class MockCharacterBloc extends MockBloc<CharacterEvent, CharacterState> implements CharacterBloc {}
 class MockLeaderboardBloc extends MockBloc<LeaderboardEvent, LeaderboardState> implements LeaderboardBloc {}

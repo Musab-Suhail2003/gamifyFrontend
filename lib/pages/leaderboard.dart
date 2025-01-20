@@ -1,12 +1,14 @@
 import 'package:Gamify/bloc/character_bloc.dart';
 import 'package:Gamify/bloc/leaderboard_bloc.dart';
+import 'package:Gamify/models/user_model.dart';
 import 'package:Gamify/pages/characterTile.dart';
-import 'package:Gamify/pages/characterpage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../api/api_repo.dart';
+
 class LeaderBoardPage extends StatefulWidget {
-  final userData;
+  final UserModel userData;
   const LeaderBoardPage({super.key, required this.userData});
 
   @override
@@ -30,6 +32,7 @@ class LeaderboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Main scaffold remains the same
     return Scaffold(
       appBar: AppBar(
         title: const Text('Leaderboard'),
@@ -46,10 +49,9 @@ class LeaderboardView extends StatelessWidget {
       ),
       body: BlocBuilder<LeaderboardBloc, LeaderboardState>(
         builder: (context, state) {
+          // Loading and error states remain the same
           if (state is LeaderboardLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (state is LeaderboardError) {
@@ -62,11 +64,10 @@ class LeaderboardView extends StatelessWidget {
                     onPressed: () {
                       context.read<LeaderboardBloc>().add(LoadLeaderboard());
                     },
-                    child: const Text('Try Again', style: TextStyle(color: Colors.black)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.tertiary, 
-                    ), 
-
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    ),
+                    child: const Text('Try Again', style: TextStyle(color: Colors.black)),
                   ),
                 ],
               ),
@@ -81,36 +82,80 @@ class LeaderboardView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  // Selected user info section
                   Expanded(
                     flex: 0,
-                    child: getCharacter(state),
+                    child: _buildSelectedUserInfo(state, context),
                   ),
-                 Expanded(
-                  
-                  flex: 1,
-                    child: leaderboard(state),
-                ),
+                  // Leaderboard list
                   Expanded(
-                      flex: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-
-                          Expanded(flex: 0, child: IsolatedCharacterTile(userId: userData['_id'])),
-                          Row(children: [ Text("coin: ${userData['coin']} XP: ${userData['XP']} ")],),
-                          ElevatedButton(onPressed: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => CharacterCustomizationScreen(character_id: userData['Character'], userId: userData['_id'],)));
+                    flex: 1,
+                    child: leaderboard(state),
+                  ),
+                  // Bottom bar
+                  Expanded(
+                    flex: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          flex: 0,
+                          child: CharacterTile(userId: userData.user_id),
+                        ),
+                        Row(
+                          children: [
+                            Text("coin: ${userData.coin} XP: ${userData.XP} "),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            final controller = TextEditingController();
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Change Bio', style: TextStyle(fontStyle: FontStyle.normal),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const SizedBox(height: 10),
+                                      TextField(
+                                        controller: controller,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Your new bio...',
+                                        ),
+                                        maxLines: 3,
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        print('updating user bio');
+                                        await ApiRepository().updateBio(userData.user_id, controller.text);
+                                        controller.clear();
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                                      ),
+                                      child: const Text('Submit', style: TextStyle(color: Colors.black),),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.tertiary,
-                            ),
-                            child: const Text('Customize', style: TextStyle(color: Colors.black)),
-                          ) ,
-                        ],
-                      )
-                  )
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                          ),
+                          child: const Text('Change Bio', style: TextStyle(color: Colors.black)),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-              )
+              ),
             );
           }
 
@@ -120,23 +165,80 @@ class LeaderboardView extends StatelessWidget {
     );
   }
 
-  Color _getRankColor(int rank) {
-    switch (rank) {
-      case 1:
-        return Colors.amber; // Gold
-      case 2:
-        return Colors.grey[300]!; // Silver
-      case 3:
-        return Colors.brown[300]!; // Bronze
-      default:
-        return Colors.blue[100]!;
+  Widget _buildSelectedUserInfo(LeaderboardLoaded state, BuildContext context) {
+    if (state.selectedUserId == null) {
+      return const SizedBox(height: 10);
     }
+
+    // Find the selected user's entry
+    final selectedEntry = state.entries.firstWhere(
+          (entry) => entry.user.user_id == state.selectedUserId,
+      orElse: () => state.entries.first,
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Character display
+          Expanded(
+            flex: 1,
+            child: IsolatedCharacterTile(userId: state.selectedUserId!),
+          ),
+          // User info and bio
+          Expanded(
+            flex: 2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    selectedEntry.user.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    selectedEntry.user.bio ?? 'No bio available',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Rank #${selectedEntry.rank}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget getCharacter(state){
-    if(state.selectedUserId == null)
-      return SizedBox(width: 10,);
-    return CharacterTile(userId: state.selectedUserId);
+    if(state.selectedUserId == null) {
+      return const SizedBox(width: 10,);
+    }
+    return IsolatedCharacterTile(userId: state.selectedUserId);
   }
 
   Widget leaderboard(LeaderboardLoaded state) {
@@ -198,7 +300,7 @@ class LeaderboardView extends StatelessWidget {
         break;
       case 2:
         icon = Icons.military_tech;
-        color = Colors.grey[300]!;
+        color = Colors.grey[600]!;
         break;
       case 3:
         icon = Icons.emoji_events;

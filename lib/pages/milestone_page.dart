@@ -39,7 +39,7 @@ class _MilestonePageState extends State<MilestonePage> {
       child: Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.tertiary,
-        title: Text('Milestones for "${widget.quest.quest_name}"'),
+        title: Text(widget.quest.quest_name),
         centerTitle: true,
         actions: [],
       ),
@@ -60,7 +60,7 @@ class _MilestonePageState extends State<MilestonePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TaskPage(milestoneId: milestone.milestone_id),
+                        builder: (context) => TaskPage(milestoneId: milestone.milestone_id, milestoneName: milestone.title,),
                       ),
                     );
                   },

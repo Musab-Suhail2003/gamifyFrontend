@@ -38,7 +38,7 @@ class LoginPage extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => BlocProvider(
                             create: (context) => QuestModelBloc()..add(LoadQuestModel(state.userData['_id'])), // Assuming user.id exists
-                            child: QuestPage(userData: state.userData['user']),
+                            child: QuestPage(userId: state.userData['user']['_id']),
                           ),
                         ),
                       );
