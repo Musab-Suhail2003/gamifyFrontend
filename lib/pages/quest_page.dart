@@ -79,7 +79,7 @@ class _QuestPageState extends State<QuestPage> with WidgetsBindingObserver {
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                onPressed: () => _navigateToPage(LeaderBoardPage(userData: user)),
+                onPressed: () {},
                 icon: const Icon(Icons.leaderboard, weight: 50),
               ),
               backgroundColor: Theme.of(context).colorScheme.tertiary,
