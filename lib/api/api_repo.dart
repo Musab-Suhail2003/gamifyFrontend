@@ -34,7 +34,7 @@ class ApiRepository {
 
   Future<Character> getCharacterById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/characters/$id'));
       
       if (response.statusCode == 200) {
         return Character.fromJson(json.decode(response.body));

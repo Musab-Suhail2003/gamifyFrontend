@@ -14,9 +14,10 @@ class CharacterCustomizationScreen extends StatefulWidget {
 }
 
 class _CharacterCustomizationScreenState extends State<CharacterCustomizationScreen> {
+  int totalChanges = 0;
+
   @override
   Widget build(BuildContext context) {
-    int totalChanges = 0;
 
     Future<void> trackChanges(CharacterState state) async {
       int changes = 0;
@@ -251,14 +252,18 @@ class _CharacterCustomizationScreenState extends State<CharacterCustomizationScr
                           ));
 
                           await ApiRepository().updateCharacter(widget.character_id, characterData);
-                          context.read<CharacterBloc>().add(LoadCharacterById(widget.character_id));
+                          context.read<CharacterBloc>().add(LoadUserCharacters(widget.userId));
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Character Saved Successfully!')),
+                            const SnackBar(
+                              content: Text("Character Saved Successfully!"),
+                            ),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to save character: $e')),
+                            SnackBar(
+                              content: Text("Failed to save character: $e"),
+                            ),
                           );
                         }
                       },

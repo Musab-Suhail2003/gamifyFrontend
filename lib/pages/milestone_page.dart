@@ -21,9 +21,7 @@ class _MilestonePageState extends State<MilestonePage> {
 
   @override
   void initState() {
-
     super.initState();
-    // Load initial quest data when the page opens
     context.read<MilestoneBloc>().add(MilestoneLoad(widget.quest.quest_id));
   }
 

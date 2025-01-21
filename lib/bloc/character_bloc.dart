@@ -220,6 +220,7 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
     on<LoadCharacterById>((event, emit) async {
       emit(CharacterLoading());
       try {
+
         final character = await apirepo.getCharacterById(event.id);
         if (character != null) {
           emit(SingleCharacterLoaded(character));
