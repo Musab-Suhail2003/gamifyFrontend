@@ -147,18 +147,54 @@ class ApiRepository {
   }
 
   Future<List<Task>> fetchTaskbyMilestone(String milestoneId) async {
-  final response = await http.get(Uri.parse('$baseUrl/tasks/milestone/$milestoneId'));
-
-  if (response.statusCode == 200) {
-    final List<dynamic> jsonData = json.decode(response.body)['data']['tasks'];
-
-    // Convert each JSON object to a Task
-    return jsonData.map((data) => Task.fromJson(data)).toList();
-  } else {
-    throw Exception('Failed to fetch tasks');
+    final response = await http.get(Uri.parse('$baseUrl/tasks/milestone/$milestoneId'));
+  
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body)['data']['tasks'];
+  
+      // Convert each JSON object to a Task
+      return jsonData.map((data) => Task.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
   }
-}
 
+  Future<void> deleteTask(String taskId) async {
+    final response = await http.delete(
+        Uri.parse('$baseUrl/tasks/$taskId')
+    );
+
+    if (response.statusCode == 200) {
+      print(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+
+  Future<void> deleteMileStone(String milestoneId) async {
+    final response = await http.delete(
+        Uri.parse('$baseUrl/milestones/$milestoneId')
+    );
+
+    if (response.statusCode == 200) {
+      print(jsonDecode(response.body));
+      
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+
+  Future<void> deleteQuest(String QuestId) async {
+    final response = await http.delete(
+        Uri.parse('$baseUrl/quests/$QuestId')
+    );
+
+    if (response.statusCode == 200) {
+      print(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
 
   Future<dynamic> updateTask(task_id)async{
     print('$baseUrl/tasks/$task_id');

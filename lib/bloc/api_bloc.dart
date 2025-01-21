@@ -68,6 +68,34 @@ class PostQuestModel extends ApiEvent {
   List<Object> get props => [questModel];
 }
 
+class deleteQuestModel extends ApiEvent {
+  final String questId;
+
+  const deleteQuestModel(this.questId);
+
+  @override
+  List<Object> get props => [questId];
+}
+
+class deleteMilestoneModel extends ApiEvent {
+  final String milestoneId;
+
+  const deleteMilestoneModel(this.milestoneId);
+
+  @override
+  List<Object> get props => [milestoneId];
+}
+
+
+class deleteTaskModel extends ApiEvent {
+  final String taskId;
+
+  const deleteTaskModel(this.taskId);
+
+  @override
+  List<Object> get props => [taskId];
+}
+
 class PostMilestone extends ApiEvent {
   final Milestone milestone;
 
@@ -130,6 +158,33 @@ class ApiBloc extends Bloc<ApiEvent, ApiState> {
     on<PostQuestModel>(_onPostQuestModel);
     on<PostMilestone>(_onPostMilestone);
     on<PostTask>(_onPostTask);
+    on<deleteTaskModel>(_ondeleteTaskModel);
+    on<deleteMilestoneModel>(_ondeleteMilestoneModel);
+    on<deleteQuestModel>(_ondeleteQuestModel);
+  }
+
+  Future<void> _ondeleteTaskModel(deleteTaskModel event, Emitter<ApiState> emit) async {
+    try {
+      await apiRepository.deleteTask(event.taskId);
+    } catch (e) {
+      emit(ApiError(e.toString()));
+    }
+  }
+  Future<void> _ondeleteMilestoneModel(deleteMilestoneModel event, Emitter<ApiState> emit) async {
+    try {
+      await apiRepository.deleteMileStone(event.milestoneId);
+    } catch (e) {
+      emit(ApiError(e.toString()));
+    }
+  }
+  Future<void> _ondeleteQuestModel(deleteQuestModel event, Emitter<ApiState> emit) async {
+    emit(ApiLoading());
+    try {
+      await apiRepository.deleteQuest(event.questId);
+      emit(ApiLoaded<void>(null));
+    } catch (e) {
+      emit(ApiError(e.toString()));
+    }
   }
 
   Future<void> _onFetchQuestModel(FetchQuestModel event, Emitter<ApiState> emit) async {

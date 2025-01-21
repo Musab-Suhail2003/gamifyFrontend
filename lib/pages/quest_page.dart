@@ -152,6 +152,29 @@ class _QuestPageState extends State<QuestPage> with WidgetsBindingObserver {
 
   Widget _buildQuestTile(QuestModel quest) {
     return GestureDetector(
+      onLongPress: (){
+        showDialog(
+            context: context,
+            builder: (BuildContext context){
+              return  AlertDialog(
+                title: const Text('Delete Quest?'),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ApiBloc>().add(deleteQuestModel(quest.quest_id!));
+                      context.read<ApiBloc>().add(FetchQuestModel(quest.user_id));
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.black, fontStyle: FontStyle.normal),
+                    ),
+                  ),
+                ],
+              );
+            }
+        );
+      },
       onTap: () => _navigateToPage(MilestonePage(quest: quest)),
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

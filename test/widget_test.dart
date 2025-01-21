@@ -35,6 +35,7 @@ void main() {
   late MockNavigatorObserver navigatorObserver;
   late MockApiBloc apiBloc;
   late MockApiRepository apirepo;
+  late Character testCharacter;
 
   final testUserId = "test-user-123";
 
@@ -52,23 +53,25 @@ void main() {
     apirepo = MockApiRepository();
 
     when(() => apiBloc.state).thenReturn(ApiInitial());
+
+    testCharacter = Character(
+      id: "char-123",
+      userId: testUserId,
+      hairstyleIndex: 0,
+      outfitIndex: 0,
+      backgroundIndex: 0,
+      faceIndex: 0,
+      bodyIndex: 0,
+      eyeIndex: 0,
+      backAccessoryIndex: 0,
+      headWearIndex: 0,
+      noseIndex: 0,
+      irisIndex: 0,
+    );
   });
 
 
-  final testCharacter = Character(
-    id: "char-123",
-    userId: testUserId,
-    hairstyleIndex: 0,
-    outfitIndex: 0,
-    backgroundIndex: 0,
-    faceIndex: 0,
-    bodyIndex: 0,
-    eyeIndex: 0,
-    backAccessoryIndex: 0,
-    headWearIndex: 0,
-    noseIndex: 0,
-    irisIndex: 0,
-  );
+
 
   Widget createTestWidget({
     required Widget child,
@@ -238,19 +241,16 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return MaterialApp(
-      home: BlocProvider<CharacterBloc>(
-        create: (context) => characterBloc,
-        child: CharacterCustomizationScreen(
+      home:  CharacterCustomizationScreen(
           character_id: 'test-character-id',
           userId: testUserId,
         ),
-      ),
-    );
+      );
   }
 
   group('CharacterCustomizationScreen Widget Tests', () {
     testWidgets('renders AppBar with correct title and changes display', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpWidget(CharacterCustomizationScreen(character_id: 'char-123', userId: testUserId));
       await tester.pumpAndSettle();
 
       expect(find.text('Character Customization'), findsOneWidget);
@@ -258,14 +258,14 @@ void main() {
     });
 
     testWidgets('renders CharacterTile widget', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpWidget(CharacterCustomizationScreen(character_id: 'char-123', userId: testUserId));
       await tester.pumpAndSettle();
 
       expect(find.byType(CharacterTile), findsOneWidget);
     });
 
     testWidgets('renders customization options', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpWidget(CharacterCustomizationScreen(character_id: 'char-123', userId: testUserId));
       await tester.pumpAndSettle();
 
       final options = [

@@ -1,3 +1,4 @@
+import 'package:Gamify/bloc/api_bloc.dart';
 import 'package:Gamify/bloc/task_bloc.dart';
 import 'package:Gamify/models/task_model.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,28 @@ class _TaskPageState extends State<TaskPage> {
                   return Card(
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
+                      onLongPress: (){
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context){
+                              return  AlertDialog(
+                                title: const Text('Delete Task?'),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      context.read<ApiBloc>().add(deleteMilestoneModel(task.task_id));
+
+                                    },
+                                    child: const Text(
+                                      "Delete",
+                                      style: TextStyle(color: Colors.black, fontStyle: FontStyle.normal),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                        );
+                      },
                       title: Text(task.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

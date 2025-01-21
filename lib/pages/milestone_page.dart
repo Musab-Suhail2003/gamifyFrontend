@@ -70,6 +70,40 @@ class _MilestonePageState extends State<MilestonePage> {
                       vertical: 8.0
                     ),
                     child: ListTile(
+                      onLongPress: (){
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context){
+                              return  AlertDialog(
+                                title: const Text('Delete Milestone?'),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      context.read<ApiBloc>().add(deleteMilestoneModel(milestone.milestone_id));
+                                      context.read<MilestoneBloc>().add(
+                                          UpdateMilestone(milestone)
+                                      );
+                                      Navigator.of(context).pop();
+
+                                    },
+                                    child: const Text(
+                                      "Delete",
+                                      style: TextStyle(color: Colors.black, fontStyle: FontStyle.normal),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                        );
+                      },
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TaskPage(milestoneId: milestone.milestone_id, milestoneName: milestone.title,),
+                          ),
+                        );
+                      },
                       leading: IconButton(
                           onPressed: () {
                             showDialog(
@@ -100,7 +134,7 @@ class _MilestonePageState extends State<MilestonePage> {
                               },
                             );
                           }
-                      , icon: const Icon(Icons.play_arrow)),
+                      , icon:  Icon(Icons.play_arrow, color: Theme.of(context).colorScheme.tertiary,)),
                       title: Text(
                         milestone.title,
                         style: const TextStyle(fontWeight: FontWeight.bold)
