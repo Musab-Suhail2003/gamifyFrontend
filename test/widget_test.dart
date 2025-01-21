@@ -291,65 +291,56 @@ void main() {
       }
     });
 
-    // testWidgets('updates totalChanges and coins when state changes', (tester) async {
-    //   final changedCharacter = Character(
-    //     id: 'test-character-id',
-    //     userId: testUserId,
-    //     hairstyleIndex: 1,
-    //     outfitIndex: 2,
-    //     backgroundIndex: 3,
-    //     faceIndex: 0,
-    //     bodyIndex: 0,
-    //     eyeIndex: 0,
-    //     backAccessoryIndex: 0,
-    //     headWearIndex: 0,
-    //     noseIndex: 0,
-    //     irisIndex: 0,
-    //   );
-    //
-    //   when(() => characterBloc.state).thenReturn(CharacterLoaded(changedCharacter));
-    //
-    //   await tester.pumpWidget(createTestWidget(
-    //     child: CharacterCustomizationScreen(
-    //       character_id: 'test-character-id',
-    //       userId: testUserId,
-    //     ),
-    //   ));
-    //   await tester.pumpAndSettle();
-    //
-    //   expect(find.text('3 changes • 300 coins'), findsOneWidget);
-    // });
-    //
-    // testWidgets('tapping customization option triggers bloc event', (tester) async {
-    //   when(() => characterBloc.state).thenReturn(CharacterLoaded(testCharacter));
-    //
-    //   when(() => apirepo.getCharactersByUserId(any())).thenReturn(apirepo.getCharacterById('test-user-id'));
-    //
-    //   await tester.pumpWidget(createTestWidget(
-    //     child: CharacterCustomizationScreen(
-    //       character_id: 'test-character-id',
-    //       userId: testUserId,
-    //     ),
-    //   ));
-    //   await tester.pumpAndSettle();
-    //
-    //   // Scroll until we find the Hairstyle option
-    //   final hairstyleOption = find.widgetWithText(ListTile, 'Hairstyle');
-    //   await tester.scrollUntilVisible(
-    //     hairstyleOption,
-    //     500.0,
-    //     scrollable: find.descendant(
-    //       of: find.byType(SingleChildScrollView),
-    //       matching: find.byType(Scrollable),
-    //     ),
-    //   );
-    //
-    //   // Tapping
-    //   await tester.tap(hairstyleOption);
-    //   await tester.pumpAndSettle();
-    //
-    //   verify(() => characterBloc.add(any(that: isA<ChangeHairstyle>()))).called(1);
-    // });
+    testWidgets('tapping customization option triggers bloc event', (tester) async {
+      final testCharacter = Character(
+        id: 'test-character-id', userId: 'test-user-id',
+
+      );
+
+      when(() => characterBloc.state).thenReturn(CharacterLoaded(testCharacter));
+
+      when(() => characterBloc.stream).thenAnswer(
+              (_) => Stream.fromIterable([CharacterLoaded(testCharacter)])
+      );
+
+      when(() => apirepo.getCharacterById(any())).thenAnswer(
+              (_) async => testCharacter
+      );
+      when(() => apirepo.getCharactersByUserId(any())).thenAnswer(
+              (_) async => testCharacter
+      );
+
+      await tester.pumpWidget(createTestWidget(
+        child: CharacterCustomizationScreen(
+          character_id: 'test-character-id',
+          userId: testUserId,
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      verify(() => characterBloc.add(any(that: isA<LoadUserCharacters>()))).called(1);
+
+      clearInteractions(characterBloc);
+
+      // Scroll until the Hairstyle option
+      final hairstyleOption = find.widgetWithText(ListTile, 'Hairstyle');
+      await tester.scrollUntilVisible(
+        hairstyleOption,
+        500.0,
+        scrollable: find.descendant(
+          of: find.byType(SingleChildScrollView),
+          matching: find.byType(Scrollable),
+        ),
+      );
+
+      expect(hairstyleOption, findsOneWidget);
+
+      await tester.tap(hairstyleOption);
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      verify(() => characterBloc.add(any(that: isA<ChangeHairstyle>()))).called(1);
+    });
   }
   );
 
